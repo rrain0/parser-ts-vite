@@ -40,7 +40,7 @@ export function evaluate(root: AstNode, object: Record<any, any>): boolean {
         }
         
         node = nodeL
-        const context = t === 'dot' ? 'dot' : stackFrame.context
+        const context = stackFrame.context
         stack.push({ from: 'l', context })
         continue
       }
@@ -60,7 +60,7 @@ export function evaluate(root: AstNode, object: Record<any, any>): boolean {
         }
         
         node = nodeR
-        const context = t === 'dot' ? 'dot' : stackFrame.context
+        const context = stackFrame.context
         stack.push({ from: 'r', context })
         continue
       }
@@ -72,40 +72,23 @@ export function evaluate(root: AstNode, object: Record<any, any>): boolean {
     
     let value
     
-    if (t === 'or') {
-      value = stackFrame.l || stackFrame.r
+    if (t === 'plus') {
+      value = stackFrame.l + stackFrame.r
     }
-    else if (t === 'and') {
-      value = stackFrame.l && stackFrame.r
+    else if (t === 'minus') {
+      value = stackFrame.l - stackFrame.r
     }
-    else if (t === 'dot') {
-      const path = [...stackFrame.l, ...stackFrame.r]
-      if (stackFrame.context === 'dot') value = path
-      else {
-        value = object
-        for (let i = 0; i < path.length; i++) {
-          if (!(value instanceof Object)) value = undefined
-          else value = value[path[i]]
-        }
-      }
+    else if (t === 'mult') {
+      value = stackFrame.l * stackFrame.r
     }
-    else if (t === 'eq') {
-      value = stackFrame.l === stackFrame.r
+    else if (t === 'div') {
+      value = stackFrame.l / stackFrame.r
     }
-    else if (t === 'neq') {
-      value = stackFrame.l !== stackFrame.r
+    else if (t === 'pow') {
+      value = Math.pow(stackFrame.l, stackFrame.r)
     }
-    else if (t === 'gt') {
-      value = stackFrame.l > stackFrame.r
-    }
-    else if (t === 'lt') {
-      value = stackFrame.l < stackFrame.r
-    }
-    else if (t === 'gte') {
-      value = stackFrame.l >= stackFrame.r
-    }
-    else if (t === 'lte') {
-      value = stackFrame.l <= stackFrame.r
+    else if (t === 'sqrt') {
+      value = Math.sqrt(stackFrame.r)
     }
     else if (t === 'lparen') {
       value = stackFrame.r
@@ -113,21 +96,11 @@ export function evaluate(root: AstNode, object: Record<any, any>): boolean {
     else if (t === 'rparen') {
       value = stackFrame.l
     }
-    else if (t === 'ldquote') {
-      value = stackFrame.r
-    }
-    else if (t === 'rdquote') {
-      value = stackFrame.l
-    }
-    else if (t === 'string') {
-      value = node.value as string
-    }
     else if (t === 'number') {
       value = node.value as number
     }
     else if (t === 'idf') {
-      if (stackFrame.context === 'dot') value = [node.value as string]
-      else value = object[node.value as string]
+      value = object[node.value as string]
     }
     
     //console.log('value', value)
@@ -137,5 +110,5 @@ export function evaluate(root: AstNode, object: Record<any, any>): boolean {
     stack.at(-1)![stackFrame.from] = value
   }
   
-  return !!rootValue.r
+  return rootValue.r
 }

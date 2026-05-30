@@ -6,9 +6,9 @@ describe('tokenizer', () => {
   
   test('(4 * (x^3 - 5) / (2 * y)) + sqrt(16 * x) - 3 * y^2', () => {
     const lexemes = tokenize('(4 * (x^3 - 5) / (2 * y)) + sqrt(16 * x) - 3 * y^2')
-    const astTree = parse(lexemes)
+    const ast = parse(lexemes)
     // TODO
-    expect(astTree).toEqual(undefined)
+    expect(ast).toEqual(undefined)
   })
   
 })

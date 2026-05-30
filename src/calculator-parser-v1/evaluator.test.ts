@@ -5,99 +5,45 @@ import { describe, expect, test } from 'vitest'
 
 
 
-const clickEvent = {
-  id: '1',
-  timestamp: 1000,
-  nodeName: 'Button',
-  event: { type: 'click', additionalInfo: { sum: 500 } },
-  parent: { nodeName: 'Sidebar', parent: { nodeName: 'MainPage', parent: null } },
-}
-
-const mountEvent = {
-  id: '2',
-  timestamp: 2000,
-  nodeName: 'Modal',
-  event: { type: 'mount' },
-  parent: null,
-}
 
 
 
 describe('evaluator', () => {
   
-  test('null AST совпадает со всеми событиями', () => {
-    const ast = parse(tokenize(''))
-    expect(evaluate(ast, clickEvent)).toEqual(true)
-    expect(evaluate(ast, mountEvent)).toEqual(true)
+  const vars = { x: 4, y: 3 }
+  
+  test('((x^3 - 5)), { x: 2, y: 3 }', () => {
+    const lexemes = tokenize('((x^3 - 5))')
+    const ast = parse(lexemes)
+    const expectedResult =
+      ((Math.pow(vars.x, 3) - 5))
+    expect(evaluate(ast, vars)).toEqual(expectedResult)
   })
   
-  test('сравнение строк — совпадение', () => {
-    const ast = parse(tokenize('event.type="click"'))
-    expect(evaluate(ast, clickEvent)).toEqual(true)
-  })
-  test('сравнение строк — несовпадение', () => {
-    const ast = parse(tokenize('event.type="click"'))
-    expect(evaluate(ast, mountEvent)).toEqual(false)
-  })
-  
-  test('сравнение с полем верхнего уровня', () => {
-    const ast = parse(tokenize('nodeName="Button"'))
-    expect(evaluate(ast, clickEvent)).toEqual(true)
-    expect(evaluate(ast, mountEvent)).toEqual(false)
+  test('(4 * (x^3 - 5)), { x: 2, y: 3 }', () => {
+    const lexemes = tokenize('(4 * (x^3 - 5))')
+    const ast = parse(lexemes)
+    const expectedResult =
+      (4 * (Math.pow(vars.x, 3) - 5))
+    expect(evaluate(ast, vars)).toEqual(expectedResult)
   })
   
-  test('оператор неравенства', () => {
-    const ast = parse(tokenize('event.type!="click"'))
-    expect(evaluate(ast, clickEvent)).toEqual(false)
-    expect(evaluate(ast, mountEvent)).toEqual(true)
+  test('(4 * (x^3 - 5) / (2 * y)), { x: 2, y: 3 }', () => {
+    const lexemes = tokenize('(4 * (x^3 - 5) / (2 * y))')
+    const ast = parse(lexemes)
+    const expectedResult =
+      (4 * (Math.pow(vars.x, 3) - 5) / (2 * vars.y))
+    expect(evaluate(ast, vars)).toEqual(expectedResult)
   })
   
-  test('числовое сравнение — больше', () => {
-    const ast = parse(tokenize('timestamp>1500'))
-    expect(evaluate(ast, clickEvent)).toEqual(false)
-    expect(evaluate(ast, mountEvent)).toEqual(true)
-  })
-  
-  test('числовое сравнение — меньше или равно', () => {
-    const ast = parse(tokenize('timestamp<=1000'))
-    expect(evaluate(ast, clickEvent)).toEqual(true)
-    expect(evaluate(ast, mountEvent)).toEqual(false)
-  })
-  
-  test('вложенное поле — parent.nodeName', () => {
-    const ast = parse(tokenize('parent.nodeName="Sidebar"'))
-    expect(evaluate(ast, clickEvent)).toEqual(true)
-    expect(evaluate(ast, mountEvent)).toEqual(false)
-  })
-  
-  test('null parent — неравенство возвращает true', () => {
-    const ast = parse(tokenize('parent.nodeName!="something"'))
-    expect(evaluate(ast, mountEvent)).toEqual(true)
-  })
-  
-  test('null parent — равенство возвращает false', () => {
-    const ast = parse(tokenize('parent.nodeName="something"'))
-    expect(evaluate(ast, mountEvent)).toEqual(false)
-  })
-  
-  test('AND — оба условия true', () => {
-    const ast = parse(tokenize('event.type="click" AND nodeName="Button"'))
-    expect(evaluate(ast, clickEvent)).toEqual(true)
-  })
-  
-  test('AND — одно условие false', () => {
-    const ast = parse(tokenize('event.type="click" AND nodeName="Modal"'))
-    expect(evaluate(ast, clickEvent)).toEqual(false)
-  })
-  
-  test('вложенное additionalInfo', () => {
-    const ast = parse(tokenize('event.additionalInfo.sum=500'))
-    expect(evaluate(ast, clickEvent)).toEqual(true)
-  })
-  
-  test('числовое сравнение вложенного поля', () => {
-    const ast = parse(tokenize('event.additionalInfo.sum>=500'))
-    expect(evaluate(ast, clickEvent)).toEqual(true)
+  test('(4 * (x^3 - 5) / (2 * y)) + sqrt(16 * x) - 3 * y^2, { x: 2, y: 3 }', () => {
+    const vars = { x: 4, y: 3 }
+    const lexemes = tokenize('(4 * (x^3 - 5) / (2 * y)) + sqrt(16 * x) - 3 * y^2')
+    const ast = parse(lexemes)
+    const expectedResult =
+      (4 * (Math.pow(vars.x, 3) - 5) / (2 * vars.y)) +
+      Math.sqrt(16 * vars.x) - 3 * Math.pow(vars.y, 2)
+    expect(evaluate(ast, vars)).toEqual(expectedResult)
   })
   
 })

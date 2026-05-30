@@ -57,7 +57,6 @@ export type NodeOpType =
   | 'rparen'
   | 'expression'
   // Values
-  | 'string'
   | 'number'
   | 'space'
   // Variable or field name
@@ -127,7 +126,7 @@ const rparenCtx: NodeCtx = { inCtx: ['LPAREN'], endCtx: 'LPAREN' }
 
 
 export const plusNode: Node = { type: 'plus', ...plusInT, ...defCtx }
-export const minusNode: Node = { type: 'plus', ...plusInT, ...defCtx }
+export const minusNode: Node = { type: 'minus', ...plusInT, ...defCtx }
 export const multNode: Node = { type: 'mult', ...multInT, ...defCtx }
 export const divNode: Node = { type: 'div', ...multInT, ...defCtx }
 export const powNode: Node = { type: 'pow', ...powInT, ...defCtx }
@@ -228,7 +227,6 @@ export function parse(lexemes: Lexeme[]): AstNode {
     
     
     // Для нод-значений берём и преобразуем значения
-    if (currNode.type === 'string') curr.value = lexeme.value
     if (currNode.type === 'number') curr.value = +lexeme.value
     if (currNode.type === 'idf') curr.value = lexeme.value
     
