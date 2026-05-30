@@ -1,4 +1,4 @@
-import { type Lexeme, tokenize, type TokenType } from './tokenizer.ts'
+import { type Lexeme, type TokenType } from './tokenizer.ts'
 
 
 
@@ -13,8 +13,8 @@ import { type Lexeme, tokenize, type TokenType } from './tokenizer.ts'
 
 
 export type NodeArgType =
-  | 'value' // самостоятельно вычисляемое значение
-  | 'idf' // указатель на значение извне
+  | 'Value' // самостоятельно вычисляемое значение
+  | 'Idf' // указатель на значение извне
 
 export type NodeForType =
   | 'consumer' // проверяемая нода для текущей ноды является аргументом
@@ -47,20 +47,20 @@ export type NodeCtx = NodeInCtx & NodeDefineCtx
 
 
 export type NodeOpType =
-  | 'plus'
-  | 'minus'
-  | 'mult'
-  | 'div'
-  | 'pow'
-  | 'sqrt'
-  | 'lparen'
-  | 'rparen'
-  | 'expression'
+  | 'Plus'
+  | 'Minus'
+  | 'Mult'
+  | 'Div'
+  | 'Pow'
+  | 'Sqrt'
+  | 'LParen'
+  | 'RParen'
+  | 'Expression'
   // Values
-  | 'number'
-  | 'space'
+  | 'Number'
+  | 'Space'
   // Variable or field name
-  | 'idf'
+  | 'Idf'
 
 export interface NodeOp { type: NodeOpType }
 
@@ -72,46 +72,46 @@ export type Node = NodeInTree & NodeCtx & NodeOp
 
 // Node tree params
 const exprInT: NodeInTree = {
-  forNearL: 'value', forNearR: 'value',
+  forNearL: 'Value', forNearR: 'Value',
   forLPrec: 0, forRPrec: 0,
-  needR: ['value', 'idf'],
+  needR: ['Value', 'Idf'],
 }
 const lparenInT: NodeInTree = {
-  forNearL: 'value', forNearR: 'consumer',
+  forNearL: 'Value', forNearR: 'consumer',
   forLPrec: 6, forRPrec: 1,
-  needR: ['value', 'idf'],
+  needR: ['Value', 'Idf'],
 }
 const rparenInT: NodeInTree = {
-  forNearL: 'consumer', forNearR: 'value',
+  forNearL: 'consumer', forNearR: 'Value',
   forLPrec: 1, forRPrec: 6,
-  needL: ['value', 'idf'],
+  needL: ['Value', 'Idf'],
 }
 const plusInT: NodeInTree = {
   forNearL: 'consumer', forNearR: 'consumer',
   forLPrec: 2, forRPrec: 2,
-  needL: ['value', 'idf'], needR: ['value', 'idf'],
+  needL: ['Value', 'Idf'], needR: ['Value', 'Idf'],
 }
 const multInT: NodeInTree = {
   forNearL: 'consumer', forNearR: 'consumer',
   forLPrec: 3, forRPrec: 3,
-  needL: ['value', 'idf'], needR: ['value', 'idf'],
+  needL: ['Value', 'Idf'], needR: ['Value', 'Idf'],
 }
 const powInT: NodeInTree = {
   forNearL: 'consumer', forNearR: 'consumer',
   forLPrec: 4, forRPrec: 4,
-  needL: ['value', 'idf'], needR: ['value', 'idf'],
+  needL: ['Value', 'Idf'], needR: ['Value', 'Idf'],
 }
 const sqrtInT: NodeInTree = {
-  forNearL: 'value', forNearR: 'consumer',
+  forNearL: 'Value', forNearR: 'consumer',
   forLPrec: 6, forRPrec: 5,
-  needR: ['value', 'idf'],
+  needR: ['Value', 'Idf'],
 }
 const valInT: NodeInTree = {
-  forNearL: 'value', forNearR: 'value',
+  forNearL: 'Value', forNearR: 'Value',
   forLPrec: 6, forRPrec: 6,
 }
 const idfInT: NodeInTree = {
-  forNearL: 'idf', forNearR: 'idf',
+  forNearL: 'Idf', forNearR: 'Idf',
   forLPrec: 6, forRPrec: 6,
 }
 
@@ -125,18 +125,18 @@ const rparenCtx: NodeCtx = { inCtx: ['LPAREN'], endCtx: 'LPAREN' }
 
 
 
-export const plusNode: Node = { type: 'plus', ...plusInT, ...defCtx }
-export const minusNode: Node = { type: 'minus', ...plusInT, ...defCtx }
-export const multNode: Node = { type: 'mult', ...multInT, ...defCtx }
-export const divNode: Node = { type: 'div', ...multInT, ...defCtx }
-export const powNode: Node = { type: 'pow', ...powInT, ...defCtx }
-export const sqrtNode: Node = { type: 'sqrt', ...sqrtInT, ...defCtx }
-export const lparenNode: Node = { type: 'lparen', ...lparenInT, ...lparenCtx }
-export const rparenNode: Node = { type: 'rparen', ...rparenInT, ...rparenCtx }
-export const idfNode: Node = { type: 'idf', ...idfInT, ...defCtx }
-export const numberNode: Node = { type: 'number', ...valInT, ...defCtx }
-export const spaceNode: Node = { type: 'space', ...valInT, ...defCtx }
-export const expressionNode: Node = { type: 'expression', ...exprInT, ...exprCtx }
+export const plusNode: Node = { type: 'Plus', ...plusInT, ...defCtx }
+export const minusNode: Node = { type: 'Minus', ...plusInT, ...defCtx }
+export const multNode: Node = { type: 'Mult', ...multInT, ...defCtx }
+export const divNode: Node = { type: 'Div', ...multInT, ...defCtx }
+export const powNode: Node = { type: 'Pow', ...powInT, ...defCtx }
+export const sqrtNode: Node = { type: 'Sqrt', ...sqrtInT, ...defCtx }
+export const lparenNode: Node = { type: 'LParen', ...lparenInT, ...lparenCtx }
+export const rparenNode: Node = { type: 'RParen', ...rparenInT, ...rparenCtx }
+export const idfNode: Node = { type: 'Idf', ...idfInT, ...defCtx }
+export const numberNode: Node = { type: 'Number', ...valInT, ...defCtx }
+export const spaceNode: Node = { type: 'Space', ...valInT, ...defCtx }
+export const expressionNode: Node = { type: 'Expression', ...exprInT, ...exprCtx }
 
 // Маппинг токена в ноду
 export const tokenTypeToNode: Record<TokenType, Node[]> = {
@@ -190,7 +190,7 @@ export function parse(lexemes: Lexeme[]): AstNode {
     }
     
     // Пробелы скипаем
-    if (currNode.type === 'space') {
+    if (currNode.type === 'Space') {
       continue
     }
     
@@ -227,8 +227,8 @@ export function parse(lexemes: Lexeme[]): AstNode {
     
     
     // Для нод-значений берём и преобразуем значения
-    if (currNode.type === 'number') curr.value = +lexeme.value
-    if (currNode.type === 'idf') curr.value = lexeme.value
+    if (currNode.type === 'Number') curr.value = +lexeme.value
+    if (currNode.type === 'Idf') curr.value = lexeme.value
     
     
     //console.log('prev', prev)

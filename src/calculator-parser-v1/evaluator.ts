@@ -3,9 +3,9 @@ import type { AstNode } from './parser.ts'
 
 
 export function evaluate(root: AstNode, object: Record<any, any>): boolean {
-  if (root.node.type !== 'expression') {
+  if (root.node.type !== 'Expression') {
     throw new Error(
-      `root node must be of type 'expression' but is [${JSON.stringify(root)}]`
+      `root node must be of type 'Expression' but is [${JSON.stringify(root)}]`
     )
   }
   // root может иметь ноду только справа
@@ -72,34 +72,34 @@ export function evaluate(root: AstNode, object: Record<any, any>): boolean {
     
     let value
     
-    if (t === 'plus') {
+    if (t === 'Plus') {
       value = stackFrame.l + stackFrame.r
     }
-    else if (t === 'minus') {
+    else if (t === 'Minus') {
       value = stackFrame.l - stackFrame.r
     }
-    else if (t === 'mult') {
+    else if (t === 'Mult') {
       value = stackFrame.l * stackFrame.r
     }
-    else if (t === 'div') {
+    else if (t === 'Div') {
       value = stackFrame.l / stackFrame.r
     }
-    else if (t === 'pow') {
+    else if (t === 'Pow') {
       value = Math.pow(stackFrame.l, stackFrame.r)
     }
-    else if (t === 'sqrt') {
+    else if (t === 'Sqrt') {
       value = Math.sqrt(stackFrame.r)
     }
-    else if (t === 'lparen') {
+    else if (t === 'LParen') {
       value = stackFrame.r
     }
-    else if (t === 'rparen') {
+    else if (t === 'RParen') {
       value = stackFrame.l
     }
-    else if (t === 'number') {
+    else if (t === 'Number') {
       value = node.value as number
     }
-    else if (t === 'idf') {
+    else if (t === 'Idf') {
       value = object[node.value as string]
     }
     
