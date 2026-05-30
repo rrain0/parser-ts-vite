@@ -341,32 +341,3 @@ function insertUpRToCurrL(curr: AstNode, up: AstNode) {
   up.nodeR = curr
   curr.up = up
 }
-
-
-
-export function parserTest() {
-  const inputs = [
-    'event.type="click"',
-    'timestamp>100',
-    'value=3.14',
-    'a=1.', // ?????
-    //'=', '!=', '>', '<', '>=', '<=',
-    'a=1 AND b=2 OR c=3',
-    'a=1 and b=2 or c=3',
-    '(a=1)and 4',
-    //'a="hello',
-    //'a@b',
-    '  a  =  1  ',
-  ]
-  inputs.slice(0, 1).forEach(it => {
-    try {
-      console.log('input:', it)
-      const lexemes = tokenize(it)
-      const nodes = parse(lexemes)
-      console.log('nodes', nodes)
-    }
-    catch (err) {
-      console.error(err)
-    }
-  })
-}

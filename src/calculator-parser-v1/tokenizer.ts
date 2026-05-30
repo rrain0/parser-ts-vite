@@ -160,36 +160,3 @@ function matchToken(input: string, start: number, tokens: Token[]): Lexeme | und
     }
   }
 }
-
-
-export function tokenizerTest() {
-  const inputs = [
-    'event.type="click"',
-    'timestamp>100',
-    'value=3.14',
-    'a=1.',
-    '=', '!=', '>', '<', '>=', '<=',
-    'a=1 AND b=2 OR c=3',
-    'a=1 and b=2 or c=3',
-    '(a=1)',
-    'a="hello',
-    'a@b',
-    '  a  =  1  ',
-  ]
-  inputs.forEach(it => {
-    try {
-      console.log('input:', it)
-      const lexemes = tokenize(it)
-      console.log('lexemes', lexemes.map(({
-        token: { type, inCtx },
-        start,
-        value,
-      }) => ({
-        type, value, ctx: JSON.stringify(inCtx), start,
-      })))
-    }
-    catch (err) {
-      console.error(err)
-    }
-  })
-}

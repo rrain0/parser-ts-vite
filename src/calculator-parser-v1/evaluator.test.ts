@@ -5,9 +5,6 @@ import { describe, expect, test } from 'vitest'
 
 
 
-
-
-
 describe('evaluator', () => {
   
   const vars = { x: 4, y: 3 }
