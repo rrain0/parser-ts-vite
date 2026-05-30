@@ -15,7 +15,6 @@ import { type Lexeme, tokenize, type TokenType } from './tokenizer.ts'
 export type NodeArgType =
   | 'value' // самостоятельно вычисляемое значение
   | 'idf' // указатель на значение извне
-  | 'string' // знаечние строкового литерала
 
 export type NodeForType =
   | 'consumer' // проверяемая нода для текущей ноды является аргументом
@@ -35,7 +34,6 @@ export interface NodeInTree {
 export type NodeCtxType =
   | ''
   | 'LPAREN'
-  | 'LDQUOTE'
 
 export interface NodeInCtx { inCtx: NodeCtxType[] }
 
@@ -49,19 +47,14 @@ export type NodeCtx = NodeInCtx & NodeDefineCtx
 
 
 export type NodeOpType =
-  | 'or'
-  | 'and'
-  | 'dot'
-  | 'eq'
-  | 'neq'
-  | 'gt'
-  | 'lt'
-  | 'gte'
-  | 'lte'
+  | 'plus'
+  | 'minus'
+  | 'mult'
+  | 'div'
+  | 'pow'
+  | 'sqrt'
   | 'lparen'
   | 'rparen'
-  | 'ldquote'
-  | 'rdquote'
   | 'expression'
   // Values
   | 'string'
@@ -94,42 +87,28 @@ const rparenInT: NodeInTree = {
   forLPrec: 1, forRPrec: 6,
   needL: ['value', 'idf'],
 }
-const ldquoteInT: NodeInTree = {
-  forNearL: 'value', forNearR: 'consumer',
-  forLPrec: 6, forRPrec: 1,
-  needR: ['string'],
-}
-const rdquoteInT: NodeInTree = {
-  forNearL: 'consumer', forNearR: 'value',
-  forLPrec: 1, forRPrec: 6,
-  needL: ['string'],
-}
-const orInT: NodeInTree = {
+const plusInT: NodeInTree = {
   forNearL: 'consumer', forNearR: 'consumer',
   forLPrec: 2, forRPrec: 2,
   needL: ['value', 'idf'], needR: ['value', 'idf'],
 }
-const andInT: NodeInTree = {
+const multInT: NodeInTree = {
   forNearL: 'consumer', forNearR: 'consumer',
   forLPrec: 3, forRPrec: 3,
   needL: ['value', 'idf'], needR: ['value', 'idf'],
 }
-const compInT: NodeInTree = {
+const powInT: NodeInTree = {
   forNearL: 'consumer', forNearR: 'consumer',
   forLPrec: 4, forRPrec: 4,
   needL: ['value', 'idf'], needR: ['value', 'idf'],
 }
-const dotInT: NodeInTree = {
-  forNearL: 'consumer', forNearR: 'consumer',
-  forLPrec: 5, forRPrec: 5,
-  needL: ['idf'], needR: ['idf'],
+const sqrtInT: NodeInTree = {
+  forNearL: 'value', forNearR: 'consumer',
+  forLPrec: 6, forRPrec: 5,
+  needR: ['value', 'idf'],
 }
 const valInT: NodeInTree = {
   forNearL: 'value', forNearR: 'value',
-  forLPrec: 6, forRPrec: 6,
-}
-const stringInT: NodeInTree = {
-  forNearL: 'string', forNearR: 'string',
   forLPrec: 6, forRPrec: 6,
 }
 const idfInT: NodeInTree = {
@@ -144,49 +123,34 @@ const defCtx: NodeCtx = { inCtx: ['', 'LPAREN'] }
 const exprCtx: NodeCtx = { ...defCtx, startCtx: '' }
 const lparenCtx: NodeCtx = { ...defCtx, startCtx: 'LPAREN'  }
 const rparenCtx: NodeCtx = { inCtx: ['LPAREN'], endCtx: 'LPAREN' }
-const ldquoteCtx: NodeCtx = { ...defCtx, startCtx: 'LDQUOTE' }
-const rdquoteCtx: NodeCtx = { inCtx: ['LDQUOTE'], endCtx: 'LDQUOTE' }
-const stringCtx: NodeCtx = { inCtx: ['LDQUOTE'] }
 
 
 
-export const orNode: Node = { type: 'or', ...orInT, ...defCtx }
-export const andNode: Node = { type: 'and', ...andInT, ...defCtx }
-export const dotNode: Node = { type: 'dot', ...dotInT, ...defCtx }
-export const eqNode: Node = { type: 'eq', ...compInT, ...defCtx }
-export const neqNode: Node = { type: 'neq', ...compInT, ...defCtx }
-export const gtNode: Node = { type: 'gt', ...compInT, ...defCtx }
-export const ltNode: Node = { type: 'lt', ...compInT, ...defCtx }
-export const gteNode: Node = { type: 'gte', ...compInT, ...defCtx }
-export const lteNode: Node = { type: 'lte', ...compInT, ...defCtx }
+export const plusNode: Node = { type: 'plus', ...plusInT, ...defCtx }
+export const minusNode: Node = { type: 'plus', ...plusInT, ...defCtx }
+export const multNode: Node = { type: 'mult', ...multInT, ...defCtx }
+export const divNode: Node = { type: 'div', ...multInT, ...defCtx }
+export const powNode: Node = { type: 'pow', ...powInT, ...defCtx }
+export const sqrtNode: Node = { type: 'sqrt', ...sqrtInT, ...defCtx }
 export const lparenNode: Node = { type: 'lparen', ...lparenInT, ...lparenCtx }
 export const rparenNode: Node = { type: 'rparen', ...rparenInT, ...rparenCtx }
-export const ldquoteNode: Node = { type: 'ldquote', ...ldquoteInT, ...ldquoteCtx }
-export const rdquoteNode: Node = { type: 'rdquote', ...rdquoteInT, ...rdquoteCtx }
 export const idfNode: Node = { type: 'idf', ...idfInT, ...defCtx }
-export const stringNode: Node = { type: 'string', ...stringInT, ...stringCtx }
 export const numberNode: Node = { type: 'number', ...valInT, ...defCtx }
 export const spaceNode: Node = { type: 'space', ...valInT, ...defCtx }
 export const expressionNode: Node = { type: 'expression', ...exprInT, ...exprCtx }
 
 // Маппинг токена в ноду
 export const tokenTypeToNode: Record<TokenType, Node[]> = {
-  AND: [andNode],
-  OR: [orNode],
-  NEQ: [neqNode],
-  GTE: [gteNode],
-  LTE: [lteNode],
-  DOT: [dotNode],
+  PLUS: [plusNode],
+  MINUS: [minusNode],
+  MULT: [multNode],
+  DIV: [divNode],
+  POW: [powNode],
+  SQRT: [sqrtNode],
   LPAREN: [lparenNode],
   RPAREN: [rparenNode],
-  LDQUOTE: [ldquoteNode],
-  RDQUOTE: [rdquoteNode],
-  EQ: [eqNode],
-  GT: [gtNode],
-  LT: [ltNode],
   NUMBER: [numberNode],
   IDENTIFIER: [idfNode],
-  STRING: [stringNode],
   SPACE: [spaceNode],
 }
 
