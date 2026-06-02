@@ -3,7 +3,7 @@ import {
   type Token,
   type TokenContextModifier, tokenize,
   type TokenPattern,
-} from '@/stringParser-v1/tokenizer.ts'
+} from '@/string-parser-v1/tokenizer.ts'
 import { strInputComment } from '@@/utils/test/test.ts'
 import { describe, expect, test } from 'vitest'
 
