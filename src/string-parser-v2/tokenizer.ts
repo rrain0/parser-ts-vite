@@ -107,10 +107,7 @@ export function tokenize<
 
 
 
-function matchToken<
-  TokenType extends string,
-  TokenContextType extends string
->(
+function matchToken<TokenType extends string, TokenContextType extends string>(
   input: string,
   i: number,
   tokens: Token<TokenType, TokenContextType>[],
